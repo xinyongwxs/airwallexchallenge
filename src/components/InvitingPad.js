@@ -3,6 +3,7 @@ import InvitationInfo from "./InvitationInfo";
 import "./InvitingPad.less";
 import InvitingStore from "../stores/InvitingStore";
 import InvitingActionCreator from "../actions/InvitingActionCreator";
+import BusyIndicator from "./BusyIndicator";
 
 class InvitingPad extends React.Component {
 	constructor(props) {
@@ -12,8 +13,11 @@ class InvitingPad extends React.Component {
 			invitationInfo: {
 				fullName: null,
 				email: null,
-				emailAgain: null
-			}
+				emailAgain: null,
+				errorMessage: null,
+				isEmailConflict: false
+			},
+			busy: false
 		};
 		this.showText = {
 			slogan: "A better way to enjoy every day.",
@@ -35,7 +39,10 @@ class InvitingPad extends React.Component {
 	}
 
 	handleAfterInvitation() {
-
+		let currState = Object.assign({}, this.state);
+		currState.busy = false;
+		currState.isHideInvitationInfo = true;
+		this.setState(currState);
 	}
 
 	userNameChangeHandler(param) {
@@ -73,18 +80,60 @@ class InvitingPad extends React.Component {
 		this.setState(currState);
 	}
 
+	updateInvitationErrorMsg(msg) {
+		let currState = Object.assign({}, this.state);
+		let invitationInfo = Object.assign({}, currState.invitationInfo);
+		invitationInfo.errorMessage = msg;
+		currState.invitationInfo = invitationInfo;
+		this.setState(currState);
+	}
+
+	updateIsEmailConflictStatus(status) {
+		let currState = Object.assign({}, this.state);
+		let invitationInfo = Object.assign({}, currState.invitationInfo);
+		invitationInfo.isEmailConflict = status;
+		currState.invitationInfo = invitationInfo;
+		this.setState(currState);
+	}
+
 	inviteSubmitHandler(event) {
 		event.preventDefault();
 		let info = this.state.invitationInfo;
 
-		if (!!info.fullName && !!info.email && !!info.emailAgain) {
+		if (!info.fullName) {
+			this.updateInvitationErrorMsg("User name cannot be null.");
+			return;
+		}
+
+		if (!info.email) {
+			this.updateInvitationErrorMsg("Email cannot be null.");
+			return;
+		}
+
+		if (!info.emailAgain) {
+			this.updateInvitationErrorMsg("Email confirmation cannot be null.");
+			return;
+		}
+
+		if (info.email === info.emailAgain) {
+			let currState = Object.assign({}, this.state);
+			currState.busy = true;
+			let invitationInfo = {
+				fullName: currState.invitationInfo.fullName,
+				email: currState.invitationInfo.email,
+				emailAgain: currState.invitationInfo.emailAgain,
+				errorMessage: null,
+				isEmailConflict: false
+			};
+			currState.invitationInfo = invitationInfo;
+			this.setState(currState);
 			let postInfo = {
 				name: info.fullName,
 				email: info.email
 			};
-			InvitingActionCreator.requestAnInvitation(postInfo).then(() => {
-				this.closeInviteHandler();
-			});
+			InvitingActionCreator.requestAnInvitation(postInfo);
+		} else {
+			this.updateIsEmailConflictStatus(true);
 		}
 		
 	}
@@ -98,6 +147,7 @@ class InvitingPad extends React.Component {
 	render() {
 		let info = this.state.invitationInfo;
 		return (<div className="inviting-pad">
+				{this.state.busy ? <BusyIndicator /> : null}
 				<InvitationInfo isHide={this.state.isHideInvitationInfo} 
 				handleSubmit={this.inviteSubmitHandler.bind(this)}
 				shadowClickHandler={this.closeInviteHandler.bind(this)}
@@ -106,7 +156,9 @@ class InvitingPad extends React.Component {
 				emailAgain={info.emailAgain}
 				userNameChangeHandler={this.userNameChangeHandler.bind(this)}
 				emailChangeHandler={this.emailChangeHandler.bind(this)}
-				emailAgainChangeHandler={this.emailAgainChangeHandler.bind(this)} />
+				emailAgainChangeHandler={this.emailAgainChangeHandler.bind(this)}
+				errorMessage={this.state.invitationInfo.errorMessage}
+				isEmailConflict={this.state.invitationInfo.isEmailConflict} />
 				<div className="pad-header"></div>
 				<div className="pad-body">
 					<div className="center-content">
