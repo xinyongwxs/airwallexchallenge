@@ -17,7 +17,10 @@ export default {
 		let promise = wrappedClient({
 			method: "POST",
 			path: path,
-			entity: invitationInfo
+			entity: invitationInfo,
+			headers: {
+				'Content-Type': 'application/json'
+			}
 		});
 		return promise;
 	}

@@ -38,6 +38,35 @@ class InvitingPad extends React.Component {
 
 	}
 
+	userNameChangeHandler(param) {
+		let value = param.target.value;
+		let currState = Object.assign({}, this.state);
+		let invitationInfo = Object.assign({}, currState.invitationInfo);
+		invitationInfo.fullName = value;
+		currState.invitationInfo = invitationInfo;
+		this.setState(currState);
+	}
+
+	emailChangeHandler(param) {
+		let value = param.target.value;
+		let currState = Object.assign({}, this.state);
+		let invitationInfo = Object.assign({}, currState.invitationInfo);
+		invitationInfo.email = value;
+		currState.invitationInfo = invitationInfo;
+		this.setState(currState);
+	}
+
+	emailAgainChangeHandler(param) {
+		let value = param.target.value;
+		let currState = Object.assign({}, this.state);
+		let invitationInfo = Object.assign({}, currState.invitationInfo);
+		invitationInfo.emailAgain = value;
+		currState.invitationInfo = invitationInfo;
+		this.setState(currState);
+	}
+
+
+
 	inviteBtnHandler() {
 		let currState = Object.assign({}, this.state);
 		currState.isHideInvitationInfo = false;
@@ -48,7 +77,7 @@ class InvitingPad extends React.Component {
 		event.preventDefault();
 		let info = this.state.invitationInfo;
 
-		if (!info.fullName && !info.email && !info.emailAgain) {
+		if (!!info.fullName && !!info.email && !!info.emailAgain) {
 			let postInfo = {
 				name: info.fullName,
 				email: info.email
@@ -74,7 +103,10 @@ class InvitingPad extends React.Component {
 				shadowClickHandler={this.closeInviteHandler.bind(this)}
 				fullName={info.fullName}
 				email={info.email}
-				emailAgain={info.emailAgain} />
+				emailAgain={info.emailAgain}
+				userNameChangeHandler={this.userNameChangeHandler.bind(this)}
+				emailChangeHandler={this.emailChangeHandler.bind(this)}
+				emailAgainChangeHandler={this.emailAgainChangeHandler.bind(this)} />
 				<div className="pad-header"></div>
 				<div className="pad-body">
 					<div className="center-content">

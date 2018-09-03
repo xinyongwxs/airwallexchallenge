@@ -27,7 +27,7 @@ let invitingStore = new InvitingStore();
 invitingStore.dispatchToken = AppDispatcher.register((payload) => {
 	switch(payload.type) {
 		case ActionTypes.REQUEST_AN_INVITATION:
-			this.requestAnInvitation(payload.data);
+			invitingStore.requestAnInvitation(payload.data);
 			break;
 		default:
 			break;
