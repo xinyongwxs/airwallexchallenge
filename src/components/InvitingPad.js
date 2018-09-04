@@ -42,6 +42,14 @@ class InvitingPad extends React.Component {
 		let currState = Object.assign({}, this.state);
 		currState.busy = false;
 		currState.isHideInvitationInfo = true;
+		let invitationInfo = {
+			fullName: null,
+			email: null,
+			emailAgain: null,
+			errorMessage: null,
+			isEmailConflict: false
+		};
+		currState.invitationInfo = invitationInfo;
 		this.setState(currState);
 	}
 
@@ -92,8 +100,16 @@ class InvitingPad extends React.Component {
 		let currState = Object.assign({}, this.state);
 		let invitationInfo = Object.assign({}, currState.invitationInfo);
 		invitationInfo.isEmailConflict = status;
+		if (status) {
+			invitationInfo.errorMessage = "Email confirmation must be same with email.";
+		}
 		currState.invitationInfo = invitationInfo;
 		this.setState(currState);
+	}
+
+	validateEmail(email) {
+	    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	    return re.test(String(email).toLowerCase());
 	}
 
 	inviteSubmitHandler(event) {
@@ -107,6 +123,11 @@ class InvitingPad extends React.Component {
 
 		if (!info.email) {
 			this.updateInvitationErrorMsg("Email cannot be null.");
+			return;
+		}
+
+		if (!this.validateEmail(info.email)) {
+			this.updateInvitationErrorMsg("Invalid email format.");
 			return;
 		}
 
