@@ -55,7 +55,8 @@ class InvitingPad extends React.Component {
 	}
 
 	componentWillUnmount() {
-
+		InvitingStore.removeRejectInvitationChangeListener();
+		InvitingStore.removeInvitationChangeListener();
 	}
 
 	handleRejectedInvitation(data) {
@@ -239,7 +240,7 @@ class InvitingPad extends React.Component {
 								infoContent={this.state.finishedInfo.finishedInfoContent}
 								btnClickHandler={this.state.isEjected ? 
 									this.ejectedOkHandler.bind(this) : this.finishedClickHandler.bind(this)} />
-				<div className="pad-header"></div>
+				<div className="pad-header"><span className="header-title">BROCCOLI & CO.</span></div>
 				<div className="pad-body" ref={(ref) => {
 					this.padBodyRef = ref;
 				}}>
@@ -253,7 +254,10 @@ class InvitingPad extends React.Component {
 							</div>
 					</div>
 				</div>
-				<div className="pad-footer"></div>
+				<div className="pad-footer">
+					<span className="footer-title">Made with ♥ in Melbourne.</span>
+					<span className="footer-script">© 2016 Broccoli & Co. All rights reserved.</span>
+				</div>
 			</div>);
 	}
 }

@@ -28,6 +28,10 @@ class InvitingStore extends EventEmitter {
 	removeInvitationChangeListener() {
 		this.removeAllListener("invitationChange");
 	}
+
+	removeRejectInvitationChangeListener() {
+		this.removeAllListener("rejectInvitationChange");
+	}
 }
 
 let invitingStore = new InvitingStore();
