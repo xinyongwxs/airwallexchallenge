@@ -51,7 +51,9 @@ class InvitingPad extends React.Component {
 		let windowInnerHeight = window.innerHeight;
 		let padBodyHeight = windowInnerHeight - 120;
 		let padBodyRef = this.padBodyRef;
-		padBodyRef.style.height = padBodyHeight + "px";
+		if (padBodyRef !== null) {
+			padBodyRef.style.height = padBodyHeight + "px";
+		}
 	}
 
 	componentWillUnmount() {
