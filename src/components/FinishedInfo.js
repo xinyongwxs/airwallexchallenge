@@ -16,8 +16,8 @@ class FinishedInfo extends React.Component {
 
 	render() {
 		const content = (<div className="finished-info">
-			<span className="finished-info-content"></span>
-			<div className="finished-button"></div>
+			<span className="finished-info-content">{this.props.infoContent}</span>
+			<div className="finished-button" onClick={this.props.btnClickHandler}>OK</div>
 			</div>);
 		return (<Popup shadowClickHandler={this.props.shadowClickHandler}
 						content={content}

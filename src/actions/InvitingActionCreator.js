@@ -11,6 +11,11 @@ export default {
 				type: ActionTypes.REQUEST_AN_INVITATION,
 				data: data
 			});
+		}, (data) => {
+			AppDispatcher.dispatch({
+				type: ActionTypes.REJECT_AN_INVITATION,
+				data: data
+			});
 		});
 	}
 }

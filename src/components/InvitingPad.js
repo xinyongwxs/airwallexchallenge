@@ -1,5 +1,6 @@
 import React from "react";
 import InvitationInfo from "./InvitationInfo";
+import FinishedInfo from "./FinishedInfo";
 import "./InvitingPad.less";
 import InvitingStore from "../stores/InvitingStore";
 import InvitingActionCreator from "../actions/InvitingActionCreator";
@@ -11,12 +12,17 @@ class InvitingPad extends React.Component {
 		this.state = {
 			isHideInvitationInfo: true,
 			invitationInfo: {
-				fullName: null,
-				email: null,
-				emailAgain: null,
+				fullName: "",
+				email: "",
+				emailAgain: "",
 				errorMessage: null,
 				isEmailConflict: false
 			},
+			isHideFinishedInfo: true,
+			finishedInfo: {
+				finishedInfoContent: null
+			},
+			isEjected: false,
 			busy: false
 		};
 		this.showText = {
@@ -24,28 +30,63 @@ class InvitingPad extends React.Component {
 			postScript: "Be the first to know when we launch.",
 			inviteBtnText: "Request an invite"
 		};
+		this.padBodyRef = null;
 	}
 
 	componentWillMount() {
 		InvitingStore.addInvitationChangeListener(this.handleAfterInvitation.bind(this));
+		InvitingStore.addRejectInvitationChangeListener(this.handleRejectedInvitation.bind(this));
 	}
 
 	componentDidMount() {
 
+		window.addEventListener("resize", () => {
+			let windowInnerHeight = window.innerHeight;
+			let padBodyHeight = windowInnerHeight - 120;
+			let padBodyRef = this.padBodyRef;
+			padBodyRef.style.height = padBodyHeight + "px";
+		});
 	}
 
 	componentWillUnmount() {
 
 	}
 
-	handleAfterInvitation() {
+	handleRejectedInvitation(data) {
 		let currState = Object.assign({}, this.state);
 		currState.busy = false;
 		currState.isHideInvitationInfo = true;
+		currState.isHideFinishedInfo = false;
+		currState.isEjected = true;
+		if (data.entity != null) {
+			let finishedInfo = Object.assign({}, this.state.finishedInfo);
+			finishedInfo.finishedInfoContent = data.entity.errorMessage;
+			currState.finishedInfo = finishedInfo;
+		}
+		this.setState(currState);
+	}
+
+	ejectedOkHandler() {
+		let currState = Object.assign({}, this.state);
+		currState.isHideFinishedInfo = true;
+		currState.isHideInvitationInfo = false;
+		this.setState(currState);
+	}
+
+	handleAfterInvitation(data) {
+		let currState = Object.assign({}, this.state);
+		currState.busy = false;
+		currState.isHideInvitationInfo = true;
+		currState.isHideFinishedInfo = false;
+		currState.isEjected = false;
+		let finishedInfo = Object.assign({}, this.state.finishedInfo);
+		finishedInfo.finishedInfoContent = "You will be one of first to experience Broccoli & Co. when we launch.";
+		currState.finishedInfo = finishedInfo;
+
 		let invitationInfo = {
-			fullName: null,
-			email: null,
-			emailAgain: null,
+			fullName: "",
+			email: "",
+			emailAgain: "",
 			errorMessage: null,
 			isEmailConflict: false
 		};
@@ -165,8 +206,14 @@ class InvitingPad extends React.Component {
 		this.setState(currState);
 	}
 
+	finishedClickHandler() {
+		let currState = Object.assign({}, this.state);
+		currState.isHideFinishedInfo = true;
+		this.setState(currState);
+	}
+
 	render() {
-		let info = this.state.invitationInfo;
+		let info = Object.assign({}, this.state.invitationInfo);
 		return (<div className="inviting-pad">
 				{this.state.busy ? <BusyIndicator /> : null}
 				<InvitationInfo isHide={this.state.isHideInvitationInfo} 
@@ -180,8 +227,14 @@ class InvitingPad extends React.Component {
 				emailAgainChangeHandler={this.emailAgainChangeHandler.bind(this)}
 				errorMessage={this.state.invitationInfo.errorMessage}
 				isEmailConflict={this.state.invitationInfo.isEmailConflict} />
+				<FinishedInfo isHide={this.state.isHideFinishedInfo}
+								infoContent={this.state.finishedInfo.finishedInfoContent}
+								btnClickHandler={this.state.isEjected ? 
+									this.ejectedOkHandler.bind(this) : this.finishedClickHandler.bind(this)} />
 				<div className="pad-header"></div>
-				<div className="pad-body">
+				<div className="pad-body" ref={(ref) => {
+					this.padBodyRef = ref;
+				}}>
 					<div className="center-content">
 							<div className="slogan">{this.showText.slogan}</div>
 							<div className="post-script">{this.showText.postScript}</div>
