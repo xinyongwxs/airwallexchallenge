@@ -16,7 +16,8 @@ class InvitingPad extends React.Component {
 				email: "",
 				emailAgain: "",
 				errorMessage: null,
-				isEmailConflict: false
+				isEmailConflict: false,
+				errorType:null
 			},
 			isHideFinishedInfo: true,
 			finishedInfo: {
@@ -39,13 +40,18 @@ class InvitingPad extends React.Component {
 	}
 
 	componentDidMount() {
-
 		window.addEventListener("resize", () => {
-			let windowInnerHeight = window.innerHeight;
-			let padBodyHeight = windowInnerHeight - 120;
-			let padBodyRef = this.padBodyRef;
-			padBodyRef.style.height = padBodyHeight + "px";
+			this.calculateCurrentBodyHeight();
 		});
+
+		this.calculateCurrentBodyHeight();
+	}
+
+	calculateCurrentBodyHeight() {
+		let windowInnerHeight = window.innerHeight;
+		let padBodyHeight = windowInnerHeight - 120;
+		let padBodyRef = this.padBodyRef;
+		padBodyRef.style.height = padBodyHeight + "px";
 	}
 
 	componentWillUnmount() {
@@ -129,10 +135,11 @@ class InvitingPad extends React.Component {
 		this.setState(currState);
 	}
 
-	updateInvitationErrorMsg(msg) {
+	updateInvitationErrorMsg(msg, errorType) {
 		let currState = Object.assign({}, this.state);
 		let invitationInfo = Object.assign({}, currState.invitationInfo);
 		invitationInfo.errorMessage = msg;
+		invitationInfo.errorType = errorType;
 		currState.invitationInfo = invitationInfo;
 		this.setState(currState);
 	}
@@ -158,22 +165,22 @@ class InvitingPad extends React.Component {
 		let info = this.state.invitationInfo;
 
 		if (!info.fullName) {
-			this.updateInvitationErrorMsg("User name cannot be null.");
+			this.updateInvitationErrorMsg("Full name cannot be null.", "fullName");
 			return;
 		}
 
 		if (!info.email) {
-			this.updateInvitationErrorMsg("Email cannot be null.");
+			this.updateInvitationErrorMsg("Email cannot be null.", "email");
 			return;
 		}
 
 		if (!this.validateEmail(info.email)) {
-			this.updateInvitationErrorMsg("Invalid email format.");
+			this.updateInvitationErrorMsg("Invalid email format.", "email");
 			return;
 		}
 
 		if (!info.emailAgain) {
-			this.updateInvitationErrorMsg("Email confirmation cannot be null.");
+			this.updateInvitationErrorMsg("Email confirmation cannot be null.", "emailAgain");
 			return;
 		}
 
@@ -226,6 +233,7 @@ class InvitingPad extends React.Component {
 				emailChangeHandler={this.emailChangeHandler.bind(this)}
 				emailAgainChangeHandler={this.emailAgainChangeHandler.bind(this)}
 				errorMessage={this.state.invitationInfo.errorMessage}
+				errorType={this.state.invitationInfo.errorType}
 				isEmailConflict={this.state.invitationInfo.isEmailConflict} />
 				<FinishedInfo isHide={this.state.isHideFinishedInfo}
 								infoContent={this.state.finishedInfo.finishedInfoContent}
