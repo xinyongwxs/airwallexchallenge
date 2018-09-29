@@ -26,8 +26,7 @@ describe("InvitingPad test", () => {
 			invitationInfo.email = "hello@sa.com";
 			invitationInfo.emailAgain = "hello@sa.com";
 			currState.invitationInfo = invitationInfo;
-			wrapper.instance().setState(currState);
-			setTimeout(() => {
+			wrapper.instance().setState(currState, () => {
 				wrapper.update();
 				wrapper.instance().inviteSubmitHandler({
 					preventDefault: () => {}
@@ -39,13 +38,12 @@ describe("InvitingPad test", () => {
 					invitationInfo.email = "hello@sb.com";
 					invitationInfo.emailAgain = "hello@sa.com";
 					currState.invitationInfo = invitationInfo;
-					wrapper.instance().setState(currState);
-					setTimeout(() => {
+					wrapper.instance().setState(currState, () => {
 						wrapper.update();
 						expect(wrapper.find(".error-input").length).toEqual(2);
-					}, 300);
+					});
 				}, 300);
-			}, 300);
+			});
 		}, 300);
 	});
 
